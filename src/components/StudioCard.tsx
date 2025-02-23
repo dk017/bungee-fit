@@ -92,9 +92,17 @@ export const StudioCard = ({
 
         {/* Description */}
         {studio.description && (
-          <p className="mt-4 text-gray-600 text-sm sm:text-base whitespace-pre-line">
-            {studio.description}
-          </p>
+          <div className="mt-4 text-gray-600 text-sm sm:text-base">
+            {studio.description
+              .replace(/\\n/g, "\n")
+              .split("\n")
+              .filter((paragraph) => paragraph.trim() !== "")
+              .map((paragraph, index) => (
+                <p key={index} className={`${index > 0 ? "mt-4" : ""}`}>
+                  {paragraph.trim()}
+                </p>
+              ))}
+          </div>
         )}
       </div>
 
