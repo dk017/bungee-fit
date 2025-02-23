@@ -1,4 +1,4 @@
-import { Article } from '@/lib/supabase';
+import { Article } from "../lib/supabase";
 
 interface ArticleContentProps {
   article: Article;
@@ -17,7 +17,10 @@ export function ArticleContent({ article }: ArticleContentProps) {
         )}
       </div>
 
-      <div className="content" dangerouslySetInnerHTML={{ __html: article.content }} />
+      <div
+        className="content"
+        dangerouslySetInnerHTML={{ __html: article.content }}
+      />
 
       {/* Author Section */}
       {article.author_name && (

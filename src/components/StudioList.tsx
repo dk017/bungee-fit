@@ -24,6 +24,7 @@ export const StudioList = ({ studios, cityName }: StudioListProps) => {
           {studios.map((studio) => (
             <StudioCard
               key={studio.id}
+              cityName={cityName}
               studio={studio}
               isSelected={selectedStudio?.id === studio.id}
               onSelect={(studio) => {

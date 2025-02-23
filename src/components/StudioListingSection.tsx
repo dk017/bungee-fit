@@ -32,6 +32,7 @@ export const StudioListingSection = ({
           <StudioCard
             key={studio.id}
             studio={studio}
+            cityName={cityName}
             isSelected={selectedStudio?.id === studio.id}
             onSelect={handleStudioSelect}
           />
