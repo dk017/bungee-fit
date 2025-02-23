@@ -8,7 +8,18 @@ import { StudioCard } from "../../components/StudioCard";
 import { AuthorCard } from "../../components/AuthorCard";
 import { ClientCityPage } from "../../components/ClientCityPage";
 import { CityFeaturedImage } from "../../components/CityFeaturedImage";
-import { getCityWithRelatedData } from "../../lib/supabase";
+import { getCityWithRelatedData, supabase } from "../../lib/supabase";
+
+// Add generateStaticParams
+export async function generateStaticParams() {
+  const { data: cities } = await supabase.from("cities").select("slug");
+
+  if (!cities) return [];
+
+  return cities.map((city) => ({
+    city: `bungee-fitness-${city.slug}`,
+  }));
+}
 
 interface PageProps {
   params: {
