@@ -15,7 +15,12 @@ const nextConfig = {
       use: ['@svgr/webpack']
     });
     return config;
-  }
+  },
+  output: "export",
+  distDir: ".next",
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;

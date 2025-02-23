@@ -10,6 +10,8 @@ import { ClientCityPage } from "../../components/ClientCityPage";
 import { CityFeaturedImage } from "../../components/CityFeaturedImage";
 import { getCityWithRelatedData } from "../../lib/supabase";
 
+export const runtime = "edge";
+
 interface PageProps {
   params: {
     city: string;
