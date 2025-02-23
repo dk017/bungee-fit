@@ -38,7 +38,7 @@ export async function getCityWithRelatedData(citySlug: string) {
       *,
       studios (
         *,
-        programs (*),
+        studio_programs (*),
         pricing_plans (*),
         instructors (*)
       )

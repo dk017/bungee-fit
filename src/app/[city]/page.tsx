@@ -10,9 +10,6 @@ import { ClientCityPage } from "../../components/ClientCityPage";
 import { CityFeaturedImage } from "../../components/CityFeaturedImage";
 import { getCityWithRelatedData } from "../../lib/supabase";
 
-export const dynamic = "force-dynamic";
-export const dynamicParams = true;
-
 interface PageProps {
   params: {
     city: string;
