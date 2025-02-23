@@ -1,6 +1,5 @@
 import { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
-import { supabase } from "../../lib/supabase";
 import {
   generateCityIntro,
   generateCityConclusion,
@@ -9,142 +8,11 @@ import { StudioCard } from "../../components/StudioCard";
 import { AuthorCard } from "../../components/AuthorCard";
 import { ClientCityPage } from "../../components/ClientCityPage";
 import { CityFeaturedImage } from "../../components/CityFeaturedImage";
+import { getCityWithRelatedData } from "../../lib/supabase";
 
 interface PageProps {
   params: {
     city: string;
-  };
-}
-
-async function getCityData(citySlug: string) {
-  const cleanSlug = citySlug.replace("bungee-fitness-", "").toLowerCase();
-
-  // First get the city
-  const { data: city } = await supabase
-    .from("cities")
-    .select("*")
-    .eq("slug", cleanSlug)
-    .single();
-
-  if (!city) return null;
-
-  // Get studios with all related data
-  const { data: studios } = await supabase
-    .from("studios")
-    .select(
-      `
-      *,
-      studio_programs (
-        id,
-        name,
-        description,
-        duration,
-        level,
-        prerequisites
-      ),
-      studio_pricing (
-        id,
-        name,
-        price,
-        duration,
-        description,
-        features
-      ),
-      studio_reviews (
-        id,
-        author_name,
-        rating,
-        review_text,
-        review_date,
-        source,
-        verified
-      ),
-      studio_instructors (
-        id,
-        name,
-        bio,
-        photo_url,
-        certifications
-      )
-    `
-    )
-    .eq("city_id", city.id)
-    .eq("business_status", "OPERATIONAL");
-
-  if (!studios) return null;
-
-  // Transform the data to match our Studio type
-  const transformedStudios = studios.map((studio) => {
-    // Parse and transform hours to match our interface
-    const rawHours =
-      typeof studio.hours_of_operation === "string"
-        ? JSON.parse(studio.hours_of_operation)
-        : studio.hours_of_operation;
-
-    const formattedHours = Object.entries(rawHours || {}).reduce(
-      (acc, [day, hours]) => {
-        if (hours === "Closed") {
-          acc[day.toLowerCase()] = { closed: true };
-        } else if (typeof hours === "string") {
-          const [open, close] = hours
-            .replace(" AM", "")
-            .replace(" PM", "")
-            .split(" - ");
-          acc[day.toLowerCase()] = { open, close };
-        }
-        return acc;
-      },
-      {}
-    );
-
-    return {
-      id: studio.id,
-      cityId: studio.city_id,
-      name: studio.name,
-      slug: studio.slug,
-      businessStatus: studio.business_status,
-      rating: studio.rating,
-      reviewCount: studio.review_count,
-      priceLevel: studio.price_level,
-      address: studio.address,
-      neighborhood: studio.neighborhood,
-      postalCode: studio.postal_code,
-      latitude: parseFloat(studio.latitude),
-      longitude: parseFloat(studio.longitude),
-      phone: studio.phone,
-      email: studio.email,
-      website: studio.website,
-      instagramHandle: studio.instagram_handle,
-      facebookUrl: studio.facebook_url,
-      description: studio.description,
-      amenities: studio.amenities,
-      hoursOfOperation: formattedHours,
-      weightLimits: studio.weight_limits,
-      ageLimit: studio.age_limit,
-      featured: studio.featured,
-      verified: studio.verified,
-      createdAt: studio.created_at,
-      updatedAt: studio.updated_at,
-      pricing: studio.studio_pricing,
-      programs: studio.studio_programs,
-      featured_image_path: studio.featured_image_path,
-      gallery_image_paths: studio.gallery_image_paths,
-      booking_url: studio.booking_url,
-      reviews:
-        studio.studio_reviews?.map((review) => ({
-          id: review.id,
-          authorName: review.author_name, // match the database field name
-          rating: review.rating,
-          reviewText: review.review_text, // match the database field name
-          reviewDate: review.review_date, // match the database field name
-          source: review.source,
-        })) || [],
-    };
-  });
-
-  return {
-    city,
-    studios: transformedStudios,
   };
 }
 
@@ -156,14 +24,14 @@ export async function generateMetadata(
   const citySlug = params.city.replace("bungee-fitness-", "");
 
   // Get city data from Supabase
-  const cityData = await getCityData(citySlug);
+  const cityData = await getCityWithRelatedData(citySlug);
 
   // Format city name for display (e.g., "new-york" -> "New York")
   const cityName =
-    cityData?.city?.name ||
+    cityData?.name ||
     citySlug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
-  const stateOrCountry = cityData?.city?.state || cityData?.city?.country || "";
+  const stateOrCountry = cityData?.state || cityData?.country || "";
 
   return {
     title: `Bungee Fitness in ${cityName} - Find Local Studios & Classes`,
@@ -209,19 +77,21 @@ export async function generateMetadata(
 }
 
 export default async function CityPage({ params }: PageProps) {
-  const data = await getCityData(params.city);
-  if (!data) notFound();
+  const citySlug = params.city.replace("bungee-fitness-", "");
+  const cityData = await getCityWithRelatedData(citySlug);
 
-  const { city, studios } = data;
+  if (!cityData) notFound();
+
+  // Destructure the data directly
+  const { name, state, country, description, imageUrl, studios } = cityData;
 
   return (
-    <ClientCityPage cityName={city.name}>
+    <ClientCityPage cityName={name}>
       <main className="min-h-screen bg-white">
-        {/* Replace the existing hero section with CityFeaturedImage */}
         <CityFeaturedImage
-          cityName={city.name}
-          stateName={city.state}
-          imageUrl={city.imageUrl}
+          cityName={name}
+          stateName={state || country}
+          imageUrl={imageUrl}
         />
 
         {/* What is Bungee Fitness Section */}
@@ -234,10 +104,10 @@ export default async function CityPage({ params }: PageProps) {
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    {city.name}, known for {city.description}, has embraced the
-                    innovative workout trend of Bungee Fitness. This unique
-                    aerial workout combines resistance training, cardio, and
-                    dance elements while being suspended in a bungee harness.
+                    {name}, known for {description}, has embraced the innovative
+                    workout trend of Bungee Fitness. This unique aerial workout
+                    combines resistance training, cardio, and dance elements
+                    while being suspended in a bungee harness.
                   </p>
                   <h3 className="text-xl font-semibold mb-3">
                     Benefits of Bungee Fitness:
@@ -285,14 +155,14 @@ export default async function CityPage({ params }: PageProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="prose prose-lg max-w-none">
               {generateCityIntro({
-                name: city.name,
-                state: city.state,
+                name: name,
+                state: state,
                 studioCount: studios.length,
                 uniqueFeatures: [
-                  `Known for ${city.description},`,
-                  `${city.name} provides an ideal setting for this innovative workout.`,
+                  `Known for ${description},`,
+                  `${name} provides an ideal setting for this innovative workout.`,
                 ],
-                nearbyCity: city.nearbyCity,
+                nearbyCity: cityData?.nearbyCity,
               }).map((paragraph, index) => (
                 <p key={index} className="mb-4">
                   {paragraph}
@@ -306,15 +176,11 @@ export default async function CityPage({ params }: PageProps) {
         <section className="bg-white py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold mb-8">
-              Bungee Fitness Studios in {city.name}
+              Bungee Fitness Studios in {name}
             </h2>
             <div className="space-y-6">
-              {studios.map((studio) => (
-                <StudioCard
-                  key={studio.id}
-                  studio={studio}
-                  cityName={city.name}
-                />
+              {studios?.map((studio) => (
+                <StudioCard key={studio.id} studio={studio} cityName={name} />
               ))}
             </div>
           </div>
@@ -325,14 +191,14 @@ export default async function CityPage({ params }: PageProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="prose prose-lg max-w-none">
               {generateCityConclusion({
-                name: city.name,
-                state: city.state,
+                name: name,
+                state: state,
                 studioCount: studios.length,
                 uniqueFeatures: [
-                  `Known for ${city.description},`,
-                  `${city.name} provides an ideal setting for this innovative workout.`,
+                  `Known for ${description},`,
+                  `${name} provides an ideal setting for this innovative workout.`,
                 ],
-                nearbyCity: city.nearbyCity,
+                nearbyCity: cityData?.nearbyCity,
               }).map((paragraph, index) => (
                 <p key={index} className="mb-4">
                   {paragraph}
@@ -423,18 +289,4 @@ export default async function CityPage({ params }: PageProps) {
       </main>
     </ClientCityPage>
   );
-}
-
-// Add middleware to handle redirects
-export function middleware(request: Request) {
-  const url = new URL(request.url);
-
-  // If it's already in the correct format, do nothing
-  if (!url.pathname.startsWith("/bungee-fitness-")) {
-    return;
-  }
-
-  // Remove the prefix and redirect
-  const city = url.pathname.replace("/bungee-fitness-", "");
-  return Response.redirect(new URL(`/${city}`, request.url));
 }
