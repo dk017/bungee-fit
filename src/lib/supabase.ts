@@ -39,8 +39,8 @@ export async function getCityWithRelatedData(citySlug: string) {
       studios (
         *,
         studio_programs (*),
-        pricing_plans (*),
-        instructors (*)
+        studio_pricing (*),
+        studio_instructors (*)
       )
     `)
     .eq('slug', citySlug)
