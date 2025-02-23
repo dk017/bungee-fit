@@ -8,6 +8,7 @@ const nextConfig = {
         hostname: 'hohxdqffasgcrflfyrxs.supabase.co',
       },
     ],
+    unoptimized: true,
   },
   webpack(config) {
     config.module.rules.push({
@@ -18,9 +19,6 @@ const nextConfig = {
   },
   output: "export",
   distDir: ".next",
-  images: {
-    unoptimized: true,
-  },
 };
 
 export default nextConfig;
