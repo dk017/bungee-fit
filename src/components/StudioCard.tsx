@@ -121,16 +121,26 @@ export const StudioCard = ({
             <div className="col-span-1">
               <h4 className="font-medium text-gray-900 mb-3">Hours</h4>
               <div className="space-y-2 text-sm">
-                {Object.entries(studio.hoursOfOperation).map(([day, hours]) => (
-                  <div key={day} className="flex justify-between">
-                    <span className="capitalize">{day}</span>
-                    <span>
-                      {hours.closed
-                        ? "Closed"
-                        : `${hours.open} - ${hours.close}`}
-                    </span>
-                  </div>
-                ))}
+                {Object.entries(studio.hoursOfOperation).map(([day, hours]) => {
+                  // Type guard function
+                  const isHoursString = (value: any): value is string =>
+                    typeof value === "string";
+
+                  return (
+                    <div key={day} className="flex justify-between">
+                      <span className="capitalize">{day}</span>
+                      <span>
+                        {isHoursString(hours)
+                          ? hours
+                          : hours?.closed
+                          ? "Closed"
+                          : hours?.open && hours?.close
+                          ? `${hours.open} - ${hours.close}`
+                          : "Closed"}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -164,11 +174,19 @@ export const StudioCard = ({
             <div className="space-y-2">
               {studio.phone && (
                 <a
-                  href={`tel:${studio.phone}`}
-                  className="flex items-center text-gray-600 hover:text-purple-600"
+                  href={`tel:${studio.phone.replace(/\D/g, "")}`}
+                  className="flex items-center text-gray-600 hover:text-purple-600 transition-colors"
+                  aria-label={`Call ${studio.name} at ${studio.phone}`}
+                  role="button"
+                  tabIndex={0}
                 >
                   <Phone className="w-4 h-4 mr-2" />
-                  <span className="text-sm">{studio.phone}</span>
+                  <span className="text-sm">
+                    {studio.phone.replace(
+                      /(\d{1})(\d{3})(\d{3})(\d{4})/,
+                      "$1-$2-$3-$4"
+                    )}
+                  </span>
                 </a>
               )}
               {studio.email && (
