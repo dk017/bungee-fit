@@ -97,7 +97,7 @@ export default async function CityPage({ params }: PageProps) {
   const { name, state, country, description, imageUrl, studios } = cityData;
 
   return (
-    <ClientCityPage cityName={name}>
+    <ClientCityPage cityName={name} studios={studios}>
       <main className="min-h-screen bg-white">
         <CityFeaturedImage
           cityName={name}

@@ -6,12 +6,23 @@ import emailjs from "@emailjs/browser";
 
 emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!);
 
+interface Studio {
+  id: string;
+  name: string;
+  location: string;
+}
+
 interface LeadCollectorProps {
   cityName: string;
+  studios: Studio[];
   onClose: () => void;
 }
 
-export const LeadCollector = ({ cityName, onClose }: LeadCollectorProps) => {
+export const LeadCollector = ({
+  cityName,
+  studios,
+  onClose,
+}: LeadCollectorProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
@@ -21,6 +32,7 @@ export const LeadCollector = ({ cityName, onClose }: LeadCollectorProps) => {
     phone: "",
     email: "",
     preferredTime: "morning",
+    selectedStudios: [] as string[], // Array of studio IDs
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,6 +41,11 @@ export const LeadCollector = ({ cityName, onClose }: LeadCollectorProps) => {
     setSubmitStatus("idle");
 
     try {
+      const selectedStudioNames = formData.selectedStudios
+        .map((id) => studios.find((s) => s.id === id)?.name)
+        .filter(Boolean)
+        .join(", ");
+
       const result = await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_FOR_LEAD_COLLECTION!,
@@ -38,13 +55,14 @@ export const LeadCollector = ({ cityName, onClose }: LeadCollectorProps) => {
           phone: formData.phone,
           preferred_time: formData.preferredTime,
           city: cityName,
+          selected_studios: selectedStudioNames,
           type: "Lead Collection",
         }
       );
 
       if (result.status === 200) {
         setSubmitStatus("success");
-        setTimeout(() => onClose(), 3000); // Close after 3 seconds on success
+        setTimeout(() => onClose(), 3000);
       } else {
         setSubmitStatus("error");
       }
@@ -56,9 +74,18 @@ export const LeadCollector = ({ cityName, onClose }: LeadCollectorProps) => {
     }
   };
 
+  const handleStudioToggle = (studioId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedStudios: prev.selectedStudios.includes(studioId)
+        ? prev.selectedStudios.filter((id) => id !== studioId)
+        : [...prev.selectedStudios, studioId],
+    }));
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative animate-slideIn">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative animate-slideIn max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -71,11 +98,38 @@ export const LeadCollector = ({ cityName, onClose }: LeadCollectorProps) => {
             🎯 Try Bungee Fitness in {cityName}
           </h2>
           <p className="text-gray-600">
-            Get a free consultation! We'll help you find the perfect studio.
+            Select studios you're interested in and get a free consultation!
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Studio Selection */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Studios (Choose one or more)
+            </label>
+            <div className="space-y-2">
+              {studios.map((studio) => (
+                <label
+                  key={studio.id}
+                  className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.selectedStudios.includes(studio.id)}
+                    onChange={() => handleStudioToggle(studio.id)}
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-900">{studio.name}</p>
+                    <p className="text-sm text-gray-500">{studio.location}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Existing form fields */}
           <div>
             <label
               htmlFor="name"
@@ -159,15 +213,21 @@ export const LeadCollector = ({ cityName, onClose }: LeadCollectorProps) => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || formData.selectedStudios.length === 0}
             className="w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
           >
             {isSubmitting ? "Submitting..." : "Get Free Consultation"}
           </button>
 
+          {formData.selectedStudios.length === 0 && (
+            <p className="text-sm text-red-500 text-center">
+              Please select at least one studio
+            </p>
+          )}
+
           {submitStatus === "success" && (
             <p className="text-green-600 text-sm text-center">
-              Thanks! We'll call you back soon.
+              Thanks! We'll connect you with your selected studios soon.
             </p>
           )}
 

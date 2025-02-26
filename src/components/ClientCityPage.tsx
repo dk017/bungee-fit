@@ -2,13 +2,19 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { LeadCollector } from "../components/LeadCollector";
+import { Studio } from "./types";
 
 interface ClientCityPageProps {
   children: ReactNode;
   cityName: string;
+  studios: Studio[];
 }
 
-export function ClientCityPage({ children, cityName }: ClientCityPageProps) {
+export function ClientCityPage({
+  children,
+  cityName,
+  studios,
+}: ClientCityPageProps) {
   const [showLeadCollector, setShowLeadCollector] = useState(false);
 
   useEffect(() => {
@@ -31,6 +37,11 @@ export function ClientCityPage({ children, cityName }: ClientCityPageProps) {
       {showLeadCollector && (
         <LeadCollector
           cityName={cityName}
+          studios={studios.map((studio) => ({
+            id: studio.id,
+            name: studio.name,
+            location: studio.address, // or whatever location field you have
+          }))}
           onClose={() => setShowLeadCollector(false)}
         />
       )}

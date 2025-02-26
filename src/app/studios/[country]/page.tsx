@@ -6,7 +6,7 @@ import { CountryHero } from "../../../components/CountryHero";
 
 // Define all possible country routes
 export async function generateStaticParams() {
-  return [{ country: "us" }, { country: "australia" }, { country: "uk" }];
+  return [{ country: "us" }, { country: "au" }, { country: "uk" }];
 }
 
 interface PageProps {
