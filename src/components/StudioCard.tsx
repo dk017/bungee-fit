@@ -111,6 +111,10 @@ export const StudioCard = ({
         gallery_image_paths={studio.gallery_image_paths}
         studioName={studio.name}
         cityName={cityName}
+        socialHandles={{
+          instagram: studio.instagramHandle,
+          facebook: studio.facebookUrl,
+        }}
       />
 
       {/* Quick Info */}

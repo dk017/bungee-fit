@@ -44,7 +44,6 @@ export async function getCityWithRelatedData(citySlug: string) {
     console.error('Error fetching city:', cityError);
     return null;
   }
-
   // Get studios with all related data
   const { data: studios, error: studiosError } = await supabase
     .from("studios")
@@ -90,6 +89,7 @@ export async function getCityWithRelatedData(citySlug: string) {
     console.error('Error fetching studios:', studiosError);
     return null;
   }
+
 
   // Transform the data to match our Studio type
   const transformedStudios = studios.map((studio) => {
@@ -162,3 +162,68 @@ export async function getCityWithRelatedData(citySlug: string) {
     studios: transformedStudios,
   };
 }
+
+export async function getCountryCities(country: string) {
+  try {
+    console.log('Fetching cities for country:', country);
+
+    // Remove description from the query since it doesn't exist
+    const { data: cities, error: citiesError } = await supabase
+      .from('cities')
+      .select(`
+        id,
+        name,
+        state,
+        country,
+        slug,
+        featured,
+        studios (
+          id,
+          name,
+          rating,
+          review_count,
+          business_status
+        )
+      `)
+      .eq('country', country)
+      .eq('studios.business_status', 'OPERATIONAL')
+      .order('name', { ascending: true });
+
+    if (citiesError) {
+      console.error('Error fetching cities:', citiesError);
+      return { cities: null, error: citiesError };
+    }
+
+    // Transform the data to include studio count and filter out cities with no active studios
+    const citiesWithStudios = cities
+      ?.filter(city => city.studios && city.studios.length > 0)
+      ?.map(city => ({
+        id: city.id,
+        name: city.name,
+        state: city.state,
+        country: city.country,
+        slug: city.slug,
+        featured: city.featured,
+        studioCount: city.studios.length,
+        averageRating: city.studios.reduce((acc, studio) => acc + (studio.rating || 0), 0) / city.studios.length,
+        totalReviews: city.studios.reduce((acc, studio) => acc + (studio.review_count || 0), 0),
+        studios: city.studios
+      }));
+
+    console.log(`Found ${citiesWithStudios?.length || 0} cities with active studios in ${country}`);
+
+    return {
+      cities: citiesWithStudios || [],
+      error: null
+    };
+
+  } catch (error) {
+    console.error('Error in getCountryCities:', error);
+    return {
+      cities: null,
+      error: 'Failed to fetch cities'
+    };
+  }
+}
+
+// Updated types to match the actual database schema
