@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { StudioCard } from "./StudioCard";
 import { StudioMap } from "./StudioMap";
-import type { Studio } from "./types";
+import type { Studio } from "../lib/types";
 
 interface StudioListProps {
   studios: Studio[];

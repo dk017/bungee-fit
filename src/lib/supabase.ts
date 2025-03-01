@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from './database.types';
+import { Database } from './types';
+import { Studio } from './types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -8,12 +9,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
 export type Tables = Database['public']['Tables'];
 export type City = Tables['cities']['Row'];
-export type Studio = Tables['studios']['Row'];
-export type Program = Tables['programs']['Row'];
-export type PricingPlan = Tables['pricing_plans']['Row'];
-export type Instructor = Tables['instructors']['Row'];
-export type Article = Tables['articles']['Row'];
-export type Testimonial = Tables['testimonials']['Row'];
+export type Program = Tables['studio_programs']['Row'];
+export type PricingPlan = Tables['studio_pricing']['Row'];
+export type Review = Tables['studio_reviews']['Row'];
 
 export async function getCityData(citySlug: string): Promise<City | null> {
   const { data, error } = await supabase
@@ -40,15 +38,13 @@ export async function getCityWithRelatedData(citySlug: string) {
     .eq("slug", cleanSlug)
     .single();
 
-  console.log(city);
-
   if (cityError || !city) {
     console.error('Error fetching city:', cityError);
     return null;
   }
 
   // Single query for all studios with their related data
-  const { data: studios, error: studiosError } = await supabase
+  const { data: rawStudios, error: studiosError } = await supabase
     .from("studios")
     .select(`
       *,
@@ -60,17 +56,77 @@ export async function getCityWithRelatedData(citySlug: string) {
     .eq("city_id", city.id)
     .eq("business_status", "OPERATIONAL");
 
-  // Log only once
-  console.log(`Found ${studios?.length || 0} operational studios in ${city.name}`);
-
   if (studiosError) {
     console.error('Error fetching studios:', studiosError);
     return null;
   }
 
+  // Transform raw studio data to match the Studio type
+  const studios: Studio[] = rawStudios?.map(studio => ({
+    id: studio.id,
+    cityId: studio.city_id,
+    name: studio.name,
+    slug: studio.slug,
+    businessStatus: studio.business_status,
+    rating: studio.rating || undefined,
+    reviewCount: studio.review_count || 0,
+    priceLevel: studio.price_level,
+    address: studio.address,
+    neighborhood: studio.neighborhood || undefined,
+    postalCode: studio.postal_code || undefined,
+    latitude: studio.latitude || 0,
+    longitude: studio.longitude || 0,
+    phone: studio.phone || undefined,
+    email: studio.email || undefined,
+    website: studio.website || undefined,
+    instagramHandle: studio.instagram_handle || undefined,
+    facebookUrl: studio.facebook_url || undefined,
+    description: studio.description || undefined,
+    amenities: studio.amenities || {},
+    hoursOfOperation: studio.hours_of_operation || {},
+    weightLimits: studio.weight_limits || undefined,
+    ageLimit: studio.age_limit || undefined,
+    featured: studio.featured,
+    verified: studio.verified,
+    createdAt: studio.created_at,
+    updatedAt: studio.updated_at,
+    featured_image_path: studio.featured_image_path || undefined,
+    gallery_image_paths: studio.gallery_image_paths || [],
+    booking_url: studio.booking_url || undefined,
+    mapsUrl: studio.maps_url || undefined,
+
+    // Transform related data
+    programs: studio.studio_programs?.map(program => ({
+      id: program.id,
+      name: program.name,
+      description: program.description || undefined,
+      duration: program.duration,
+      level: program.level || undefined,
+      prerequisites: program.prerequisites || undefined
+    })) || [],
+
+    pricing: studio.studio_pricing?.map(price => ({
+      id: price.id,
+      name: price.name,
+      price: price.price,
+      duration: price.duration,
+      description: price.description || '',
+      features: price.features || {}
+    })) || [],
+
+    reviews: studio.studio_reviews?.map(review => ({
+      id: review.id,
+      authorName: review.author_name,
+      rating: review.rating,
+      reviewText: review.review_text || undefined,
+      reviewDate: review.review_date,
+      source: review.source || undefined
+    })) || []
+  })) || [];
+
   return {
     ...city,
-    studios: studios || []
+    studios
   };
 }
 

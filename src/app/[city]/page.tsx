@@ -10,12 +10,10 @@ import { ClientCityPage } from "../../components/ClientCityPage";
 import { CityFeaturedImage } from "../../components/CityFeaturedImage";
 import { getCityWithRelatedData, supabase } from "../../lib/supabase";
 
-// Add generateStaticParams
+// Keep generateStaticParams in the server component
 export async function generateStaticParams() {
   const { data: cities } = await supabase.from("cities").select("slug");
-
   if (!cities) return [];
-
   return cities.map((city) => ({
     city: `bungee-fitness-${city.slug}`,
   }));
@@ -93,7 +91,6 @@ export default async function CityPage({ params }: PageProps) {
 
   if (!cityData) notFound();
 
-  // Destructure the data directly
   const { name, state, country, description, imageUrl, studios } = cityData;
 
   return (
@@ -292,8 +289,8 @@ export default async function CityPage({ params }: PageProps) {
               Book your first class today and experience the joy of flying while
               working out!
             </p>
-            <button className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors">
-              Find a Studio Near You
+            <button className="bg-purple-600 text-white px-6 py-3 rounded-lg">
+              Get Free Consultation
             </button>
           </div>
         </section>

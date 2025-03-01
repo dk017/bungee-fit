@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import type { Studio } from "./types";
+import type { Studio } from "../lib/types";
 
 interface StudioMapProps {
   studios: Studio[];

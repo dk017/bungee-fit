@@ -27,4 +27,5 @@ declare module 'lucide-react' {
     export const CalendarDays: FC<IconProps>;
     export const Send: FC<IconProps>;
     export const X: FC<IconProps>;
+    export const Navigation: FC<IconProps>;
   }
