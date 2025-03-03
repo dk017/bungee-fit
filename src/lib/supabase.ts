@@ -14,6 +14,7 @@ export type PricingPlan = Tables['studio_pricing']['Row'];
 export type Review = Tables['studio_reviews']['Row'];
 
 export async function getCityData(citySlug: string): Promise<City | null> {
+  console.log("Getting city data for:", citySlug);
   const { data, error } = await supabase
     .from('cities')
     .select('*')
@@ -30,20 +31,31 @@ export async function getCityData(citySlug: string): Promise<City | null> {
 
 export async function getCityWithRelatedData(citySlug: string) {
   const cleanSlug = citySlug.replace("bungee-fitness-", "").toLowerCase();
+  console.log("Getting city with related data for:", cleanSlug);
 
-  // First get the city
-  const { data: city, error: cityError } = await supabase
+  // First get the city with .single() since we expect one city
+  const { data: cityData, error: cityError } = await supabase
     .from("cities")
-    .select("*")
+    .select(`
+      id,
+      name,
+      state,
+      country,
+      slug,
+      description,
+      featured
+    `)
     .eq("slug", cleanSlug)
     .single();
 
-  if (cityError || !city) {
+  console.log("City data:", cityData);
+
+  if (cityError || !cityData) {
     console.error('Error fetching city:', cityError);
     return null;
   }
 
-  // Single query for all studios with their related data
+  // Then get studios for this city
   const { data: rawStudios, error: studiosError } = await supabase
     .from("studios")
     .select(`
@@ -53,7 +65,7 @@ export async function getCityWithRelatedData(citySlug: string) {
       studio_reviews (*),
       studio_instructors (*)
     `)
-    .eq("city_id", city.id)
+    .eq("city_id", cityData.id)
     .eq("business_status", "OPERATIONAL");
 
   if (studiosError) {
@@ -124,8 +136,9 @@ export async function getCityWithRelatedData(citySlug: string) {
     })) || []
   })) || [];
 
+  // Return combined data
   return {
-    ...city,
+    ...cityData,
     studios
   };
 }
@@ -156,7 +169,7 @@ export async function getCountryCities(country: string) {
       .eq('country', country)
       .eq('studios.business_status', 'OPERATIONAL')
       .order('name', { ascending: true });
-
+    console.log("Cities data:", cities);
     if (citiesError) {
       console.error('Error fetching cities:', citiesError);
       return { cities: null, error: citiesError };

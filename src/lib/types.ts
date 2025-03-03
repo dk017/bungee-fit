@@ -25,7 +25,7 @@ export interface Database {
           featured: boolean;
           created_at: string;
           updated_at: string;
-          description: string | null;
+          description: string;
           unique_features: Record<string, any> | null;
         };
       };
@@ -169,6 +169,24 @@ export interface Studio {
     source?: string;
   }>;
 }
+
+export interface Country {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  imageUrl?: string;
+  uniqueFeatures?: Record<string, any>;
+  languageCode?: string;
+  currency?: string;
+  region?: string;
+}
+
 
 export type Tables = Database['public']['Tables'];
 export type City = Tables['cities']['Row'];

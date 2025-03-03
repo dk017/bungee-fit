@@ -91,16 +91,12 @@ export default async function CityPage({ params }: PageProps) {
 
   if (!cityData) notFound();
 
-  const { name, state, country, description, imageUrl, studios } = cityData;
+  const { name, state, country, description, studios } = cityData;
 
   return (
     <ClientCityPage cityName={name} studios={studios}>
       <main className="min-h-screen bg-white">
-        <CityFeaturedImage
-          cityName={name}
-          stateName={state || country}
-          imageUrl={imageUrl}
-        />
+        <CityFeaturedImage cityName={name} stateName={state || country} />
 
         {/* What is Bungee Fitness Section */}
         <section className="bg-white py-12">
@@ -170,7 +166,6 @@ export default async function CityPage({ params }: PageProps) {
                   `Known for ${description},`,
                   `${name} provides an ideal setting for this innovative workout.`,
                 ],
-                nearbyCity: cityData?.nearbyCity,
               }).map((paragraph, index) => (
                 <p key={index} className="mb-4">
                   {paragraph}
@@ -206,7 +201,6 @@ export default async function CityPage({ params }: PageProps) {
                   `Known for ${description},`,
                   `${name} provides an ideal setting for this innovative workout.`,
                 ],
-                nearbyCity: cityData?.nearbyCity,
               }).map((paragraph, index) => (
                 <p key={index} className="mb-4">
                   {paragraph}
