@@ -36,7 +36,6 @@ export function ClientCityPage({
   }, [cityName]);
 
   const handleShowLeadCollector = () => {
-    console.log("Manually showing lead collector");
     setShowLeadCollector(true);
   };
 

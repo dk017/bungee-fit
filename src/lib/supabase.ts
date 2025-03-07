@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from './types';
 import { Studio } from './types';
+import { cache } from 'react'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -14,13 +15,11 @@ export type PricingPlan = Tables['studio_pricing']['Row'];
 export type Review = Tables['studio_reviews']['Row'];
 
 export async function getCityData(citySlug: string): Promise<City | null> {
-  console.log("Getting city data for:", citySlug);
   const { data, error } = await supabase
     .from('cities')
     .select('*')
     .eq('slug', citySlug)
     .single();
-  console.log(data?.description);
   if (error) {
     console.error('Error fetching city data:', error);
     return null;
@@ -29,9 +28,9 @@ export async function getCityData(citySlug: string): Promise<City | null> {
   return data;
 }
 
-export async function getCityWithRelatedData(citySlug: string) {
+// Cache the data fetching function
+export const getCityWithRelatedData = cache(async (citySlug: string) => {
   const cleanSlug = citySlug.replace("bungee-fitness-", "").toLowerCase();
-  console.log("Getting city with related data for:", cleanSlug);
 
   // First get the city with .single() since we expect one city
   const { data: cityData, error: cityError } = await supabase
@@ -48,7 +47,6 @@ export async function getCityWithRelatedData(citySlug: string) {
     .eq("slug", cleanSlug)
     .single();
 
-  console.log("City data:", cityData);
 
   if (cityError || !cityData) {
     console.error('Error fetching city:', cityError);
@@ -68,6 +66,7 @@ export async function getCityWithRelatedData(citySlug: string) {
     .eq("city_id", cityData.id)
     .eq("business_status", "OPERATIONAL");
 
+  console.log("Studios data:", rawStudios);
   if (studiosError) {
     console.error('Error fetching studios:', studiosError);
     return null;
@@ -141,12 +140,10 @@ export async function getCityWithRelatedData(citySlug: string) {
     ...cityData,
     studios
   };
-}
+});
 
 export async function getCountryCities(country: string) {
   try {
-    console.log('Fetching cities for country:', country);
-
     // Remove description from the query since it doesn't exist
     const { data: cities, error: citiesError } = await supabase
       .from('cities')
@@ -192,7 +189,6 @@ export async function getCountryCities(country: string) {
         studios: city.studios
       }));
 
-    console.log(`Found ${citiesWithStudios?.length || 0} cities with active studios in ${country}`);
 
     return {
       cities: citiesWithStudios || [],

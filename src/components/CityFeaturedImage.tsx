@@ -38,10 +38,10 @@ export const CityFeaturedImage = ({
       <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-8">
         <div className="max-w-4xl mx-auto space-y-4">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-100">
-            Find Bungee Fitness Studios in {cityName}
+            Find Bungee Fitness Studios near {cityName}
           </h1>
           <p className="text-xl md:text-2xl text-purple-100">
-            Your Ultimate Guide to Bungee Workouts in {cityName}, {stateName}
+            Your Ultimate Guide to Bungee Workouts near {cityName}, {stateName}
           </p>
           <p className="text-lg text-purple-50/90 max-w-2xl mx-auto">
             Discover certified studios, read reviews, and start your fitness
