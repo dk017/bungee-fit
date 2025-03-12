@@ -31,7 +31,6 @@ export async function getCityData(citySlug: string): Promise<City | null> {
 // Cache the data fetching function
 export const getCityWithRelatedData = cache(async (citySlug: string) => {
   const cleanSlug = citySlug.replace("bungee-fitness-", "").toLowerCase();
-  console.log("Getting city data for:", cleanSlug);
   // First get the city with .single() since we expect one city
   const { data: cityData, error: cityError } = await supabase
     .from("cities")
@@ -47,7 +46,6 @@ export const getCityWithRelatedData = cache(async (citySlug: string) => {
     .eq("slug", cleanSlug)
     .single();
 
-    console.log("City data:", cityData);
 
   if (cityError || !cityData) {
     console.error('Error fetching city:', cityError);
@@ -66,7 +64,6 @@ export const getCityWithRelatedData = cache(async (citySlug: string) => {
     .eq("city_id", cityData.id)
     .eq("business_status", "OPERATIONAL");
 
-  console.log("Studios data:", rawStudios);
   if (studiosError) {
     console.error('Error fetching studios:', studiosError);
     return null;
@@ -166,7 +163,6 @@ export async function getCountryCities(country: string) {
       .eq('country', country)
       .eq('studios.business_status', 'OPERATIONAL')
       .order('name', { ascending: true });
-    console.log("Cities data:", cities);
     if (citiesError) {
       console.error('Error fetching cities:', citiesError);
       return { cities: null, error: citiesError };
