@@ -3,6 +3,7 @@ import { Database } from './types';
 import { Studio } from './types';
 import { cache } from 'react'
 
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
@@ -52,22 +53,73 @@ export const getCityWithRelatedData = cache(async (citySlug: string) => {
     return null;
   }
 
-  console.log("City data:", cityData.id);
   // Then get studios for this city
+  // First query - just studios
+  const { data: basicStudios, error: basicError } = await supabase
+    .from("studios")
+    .select("*")
+    .eq("city_id", cityData.id)
+    .eq("business_status", "OPERATIONAL");
+
+  console.log('Basic studios query result:', {
+    count: basicStudios?.length || 0,
+    studios: basicStudios
+  });
+
+  // Second query - studios with related data using inner joins
+  const { data: detailedStudios, error: detailedError } = await supabase
+    .from("studios")
+    .select(`
+      *,
+      studio_programs!inner (*),
+      studio_pricing!inner (*),
+      studio_reviews!inner (*)
+    `)
+    .eq("city_id", cityData.id)
+    .eq("business_status", "OPERATIONAL");
+
+  console.log('Detailed studios query result:', {
+    count: detailedStudios?.length || 0,
+    studios: detailedStudios
+  });
+
+  // Third query - check which studios have missing related data
+  if (basicStudios) {
+    for (const studio of basicStudios) {
+      const { data: programs } = await supabase
+        .from("studio_programs")
+        .select("count")
+        .eq("studio_id", studio.id);
+
+      const { data: pricing } = await supabase
+        .from("studio_pricing")
+        .select("count")
+        .eq("studio_id", studio.id);
+
+      const { data: reviews } = await supabase
+        .from("studio_reviews")
+        .select("count")
+        .eq("studio_id", studio.id);
+
+      console.log(`Studio ${studio.name} (ID: ${studio.id}) related data:`, {
+        programsCount: programs?.[0]?.count || 0,
+        pricingCount: pricing?.[0]?.count || 0,
+        reviewsCount: reviews?.[0]?.count || 0
+      });
+    }
+  }
+
+  // Use left joins instead of inner joins to get all studios
   const { data: rawStudios, error: studiosError } = await supabase
     .from("studios")
     .select(`
       *,
       studio_programs (*),
       studio_pricing (*),
-      studio_reviews (*)    `)
+      studio_reviews (*)
+    `)
     .eq("city_id", cityData.id)
     .eq("business_status", "OPERATIONAL");
-
-  if (studiosError) {
-    console.error('Error fetching studios:', studiosError);
-    return null;
-  }
 
   // Transform raw studio data to match the Studio type
   const studios: Studio[] = rawStudios?.map(studio => ({
