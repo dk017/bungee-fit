@@ -126,6 +126,7 @@ export const getCityWithRelatedData = cache(async (citySlug: string) => {
     id: studio.id,
     cityId: studio.city_id,
     name: studio.name,
+    country: cityData.country,
     slug: studio.slug,
     businessStatus: studio.business_status,
     rating: studio.rating || undefined,

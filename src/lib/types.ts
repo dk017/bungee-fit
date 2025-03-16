@@ -109,6 +109,7 @@ export interface Studio {
   id: string;
   cityId: string;
   name: string;
+  country: string;
   slug: string;
   businessStatus: 'OPERATIONAL' | 'CLOSED' | 'TEMPORARILY_CLOSED';
   rating?: number;
@@ -140,6 +141,7 @@ export interface Studio {
   gallery_image_paths: string[];
   booking_url?: string;
   mapsUrl?: string;
+
 
   // Related data
   programs: Array<{

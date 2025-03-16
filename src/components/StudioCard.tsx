@@ -25,6 +25,23 @@ interface StudioCardProps {
 
 type HourValue = string | { open?: string; close?: string; closed?: boolean };
 
+// Add a helper function to get currency symbol
+const getCurrencySymbol = (country?: string) => {
+  switch (country?.toLowerCase()) {
+    case "uk":
+    case "united kingdom":
+    case "gb":
+      return "£";
+    case "eu":
+    case "europe":
+    case "de":
+    case "germany":
+      return "€";
+    default:
+      return "$";
+  }
+};
+
 export const StudioCard = ({
   studio,
   isSelected,
@@ -262,7 +279,8 @@ export const StudioCard = ({
                       {package_.name}
                     </h5>
                     <p className="text-2xl font-bold text-purple-600 mt-2">
-                      ${package_.price}
+                      {getCurrencySymbol(studio.country)}
+                      {package_.price}
                     </p>
                     <p className="text-sm text-gray-600 mt-1">
                       {package_.duration}
