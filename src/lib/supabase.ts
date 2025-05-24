@@ -61,11 +61,6 @@ export const getCityWithRelatedData = cache(async (citySlug: string) => {
     .eq("city_id", cityData.id)
     .eq("business_status", "OPERATIONAL");
 
-  console.log('Basic studios query result:', {
-    count: basicStudios?.length || 0,
-    studios: basicStudios
-  });
-
   // Second query - studios with related data using inner joins
   const { data: detailedStudios, error: detailedError } = await supabase
     .from("studios")
@@ -77,11 +72,6 @@ export const getCityWithRelatedData = cache(async (citySlug: string) => {
     `)
     .eq("city_id", cityData.id)
     .eq("business_status", "OPERATIONAL");
-
-  console.log('Detailed studios query result:', {
-    count: detailedStudios?.length || 0,
-    studios: detailedStudios
-  });
 
   // Third query - check which studios have missing related data
   if (basicStudios) {
@@ -101,11 +91,6 @@ export const getCityWithRelatedData = cache(async (citySlug: string) => {
         .select("count")
         .eq("studio_id", studio.id);
 
-      console.log(`Studio ${studio.name} (ID: ${studio.id}) related data:`, {
-        programsCount: programs?.[0]?.count || 0,
-        pricingCount: pricing?.[0]?.count || 0,
-        reviewsCount: reviews?.[0]?.count || 0
-      });
     }
   }
 
