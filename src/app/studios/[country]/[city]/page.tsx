@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCityStudios } from "../../../../lib/supabase";
-
+export const runtime = "edge";
 interface PageProps {
   params: {
     country: string;
