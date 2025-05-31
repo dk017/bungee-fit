@@ -9,12 +9,13 @@ interface CityCardProps {
     state?: string;
     studioCount: number;
   };
+  country: string;
 }
 
-export function CityCard({ city }: CityCardProps) {
+export function CityCard({ city, country }: CityCardProps) {
   return (
     <Link
-      href={`/bungee-fitness-${city.slug}`}
+      href={`/${country.toLowerCase()}/bungee-fitness-${city.slug}`}
       className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow block"
     >
       <div className="relative w-full h-48">

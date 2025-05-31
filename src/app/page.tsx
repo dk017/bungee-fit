@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { supabase } from "../lib/supabase";
 
 type FeaturedCity = {
   id: string;
@@ -17,30 +18,6 @@ type FeaturedCity = {
     lng: number;
   };
 };
-
-const featuredCities: FeaturedCity[] = [
-  {
-    id: "1",
-    name: "New York City",
-    state: "NY",
-    country: "US",
-    slug: "new-york",
-    imageUrl: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9",
-    studioCount: 12,
-    coordinates: { lat: 40.7128, lng: -74.006 },
-  },
-  {
-    id: "2",
-    name: "Los Angeles",
-    state: "CA",
-    country: "US",
-    slug: "los-angeles",
-    imageUrl: "https://images.unsplash.com/photo-1506190503455-eca6b583c8ce",
-    studioCount: 8,
-    coordinates: { lat: 34.0522, lng: -118.2437 },
-  },
-  // Add more cities as needed
-];
 
 const benefits = [
   {
@@ -257,6 +234,60 @@ const testimonials = [
 const CitySearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [cities, setCities] = useState<FeaturedCity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("cities")
+          .select(
+            `
+            id,
+            name,
+            state,
+            country,
+            slug,
+            studios (
+              id,
+              business_status
+            )
+          `
+          )
+          .order("name", { ascending: true });
+
+        if (error) throw error;
+
+        const formattedCities = data.map((city) => ({
+          id: city.id,
+          name: city.name,
+          state: city.state || "",
+          country: city.country,
+          slug: city.slug,
+          imageUrl: `/city-images/${city.slug}.jpg`,
+          studioCount:
+            city.studios?.filter((s) => s.business_status === "OPERATIONAL")
+              .length || 0,
+          coordinates: { lat: 0, lng: 0 }, // You can add actual coordinates if available
+        }));
+
+        setCities(formattedCities);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCities();
+  }, []);
+
+  const filteredCities = cities.filter(
+    (city) =>
+      city.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      city.state.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="relative max-w-xl mx-auto">
@@ -275,23 +306,33 @@ const CitySearch = () => {
       </div>
 
       {isOpen && (
-        <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-10">
-          {featuredCities
-            .filter(
-              (city) =>
-                city.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                city.state.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .map((city) => (
+        <div className="absolute w-full mt-2 bg-white rounded-lg shadow-lg z-10 max-h-96 overflow-y-auto">
+          {loading ? (
+            <div className="px-4 py-2 text-gray-500">Loading cities...</div>
+          ) : filteredCities.length === 0 ? (
+            <div className="px-4 py-2 text-gray-500">No cities found</div>
+          ) : (
+            filteredCities.map((city) => (
               <Link
                 key={city.id}
-                href={`/bungee-fitness-${city.slug}`}
+                href={`/${city.country.toLowerCase()}/bungee-fitness-${
+                  city.slug
+                }`}
                 className="block px-4 py-2 hover:bg-gray-50"
               >
-                <span className="font-medium">{city.name}</span>,{" "}
-                <span className="text-gray-500">{city.state}</span>
+                <span className="font-medium">{city.name}</span>
+                {city.state && (
+                  <>
+                    , <span className="text-gray-500">{city.state}</span>
+                  </>
+                )}
+                <span className="text-sm text-gray-400 ml-2">
+                  {city.studioCount}{" "}
+                  {city.studioCount === 1 ? "studio" : "studios"}
+                </span>
               </Link>
-            ))}
+            ))
+          )}
         </div>
       )}
     </div>
@@ -374,6 +415,57 @@ const equipmentInfo = {
 };
 
 export default function HomePage() {
+  const [featuredCities, setFeaturedCities] = useState<FeaturedCity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedCities = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("cities")
+          .select(
+            `
+            id,
+            name,
+            state,
+            country,
+            slug,
+            featured,
+            studios (
+              id,
+              business_status
+            )
+          `
+          )
+          .eq("featured", true)
+          .order("name", { ascending: true });
+
+        if (error) throw error;
+
+        const formattedCities = data.map((city) => ({
+          id: city.id,
+          name: city.name,
+          state: city.state || "",
+          country: city.country,
+          slug: city.slug,
+          imageUrl: `/city-images/${city.slug}.jpg`,
+          studioCount:
+            city.studios?.filter((s) => s.business_status === "OPERATIONAL")
+              .length || 0,
+          coordinates: { lat: 0, lng: 0 }, // You can add actual coordinates if available
+        }));
+
+        setFeaturedCities(formattedCities);
+      } catch (error) {
+        console.error("Error fetching featured cities:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedCities();
+  }, []);
+
   return (
     <div className="space-y-12">
       {/* Hero Section */}
@@ -389,6 +481,55 @@ export default function HomePage() {
         </p>
         <div className="mt-8">
           <CitySearch />
+        </div>
+      </section>
+
+      {/* Featured Cities Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Popular Cities
+          </h2>
+          {loading ? (
+            <div className="text-center text-gray-500">Loading cities...</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredCities.map((city) => (
+                <Link
+                  key={city.id}
+                  href={`/${city.country.toLowerCase()}/bungee-fitness-${
+                    city.slug
+                  }`}
+                  className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow block"
+                >
+                  <div className="relative w-full h-48">
+                    <Image
+                      src={city.imageUrl}
+                      alt={`Bungee Fitness in ${city.name}`}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <h3 className="text-xl font-bold mb-1">
+                      Bungee Fitness in {city.name}
+                    </h3>
+                    {city.state && (
+                      <p className="text-sm opacity-90">{city.state}</p>
+                    )}
+                    <p className="text-sm mt-2">
+                      {city.studioCount}{" "}
+                      {city.studioCount === 1 ? "Studio" : "Studios"}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -450,42 +591,6 @@ export default function HomePage() {
                   ))}
                 </ul>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Popular Cities Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Popular Cities
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredCities.map((city) => (
-              <Link
-                key={city.id}
-                href={`/bungee-fitness-${city.slug}`}
-                className="group"
-              >
-                <div className="relative h-64 rounded-lg overflow-hidden">
-                  <img
-                    src={city.imageUrl}
-                    alt={`${city.name} Bungee Studios`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
-                    <div className="absolute bottom-0 p-6">
-                      <h3 className="text-2xl font-bold text-white">
-                        {city.name}, {city.state}
-                      </h3>
-                      <p className="text-white/90">
-                        {city.studioCount} Certified Studios
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
             ))}
           </div>
         </div>

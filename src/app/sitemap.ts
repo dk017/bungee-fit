@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all cities from your database
   const { data: cities } = await supabase
     .from('cities')
-    .select('slug, updated_at');
+    .select('slug, country, updated_at');
 
   const baseUrl = 'https://bungeefitnessnear.me';
 
@@ -24,10 +24,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Add dynamic city routes
+  // Add dynamic city routes with country
   if (cities) {
     const cityRoutes = cities.map((city) => ({
-      url: `${baseUrl}/bungee-fitness-${city.slug}`,
+      url: `${baseUrl}/${city.country.toLowerCase()}/bungee-fitness-${city.slug}`,
       lastModified: new Date(city.updated_at),
       changeFrequency: 'weekly' as const,
       priority: 0.8,

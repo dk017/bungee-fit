@@ -179,7 +179,6 @@ export const getCityWithRelatedData = cache(async (citySlug: string) => {
 
 export async function getCountryCities(country: string) {
   try {
-    // Remove description from the query since it doesn't exist
     const { data: cities, error: citiesError } = await supabase
       .from('cities')
       .select(`
@@ -199,30 +198,29 @@ export async function getCountryCities(country: string) {
         )
       `)
       .eq('country', country)
-      .eq('studios.business_status', 'OPERATIONAL')
       .order('name', { ascending: true });
+
     if (citiesError) {
       console.error('Error fetching cities:', citiesError);
       return { cities: null, error: citiesError };
     }
 
-    // Transform the data to include studio count and filter out cities with no active studios
-    const citiesWithStudios = cities
-      ?.filter(city => city.studios && city.studios.length > 0)
-      ?.map(city => ({
-        id: city.id,
-        name: city.name,
-        state: city.state,
-        country: city.country,
-        slug: city.slug,
-        featured: city.featured,
-        studioCount: city.studios.length,
-        description: city.description,
-        averageRating: city.studios.reduce((acc, studio) => acc + (studio.rating || 0), 0) / city.studios.length,
-        totalReviews: city.studios.reduce((acc, studio) => acc + (studio.review_count || 0), 0),
-        studios: city.studios
-      }));
-
+    // Transform the data to include studio count
+    const citiesWithStudios = cities?.map(city => ({
+      id: city.id,
+      name: city.name,
+      state: city.state,
+      country: city.country,
+      slug: city.slug,
+      featured: city.featured,
+      studioCount: city.studios?.filter(studio => studio.business_status === 'OPERATIONAL').length || 0,
+      description: city.description,
+      averageRating: city.studios?.length 
+        ? city.studios.reduce((acc, studio) => acc + (studio.rating || 0), 0) / city.studios.length 
+        : 0,
+      totalReviews: city.studios?.reduce((acc, studio) => acc + (studio.review_count || 0), 0) || 0,
+      studios: city.studios
+    }));
 
     return {
       cities: citiesWithStudios || [],
@@ -235,6 +233,27 @@ export async function getCountryCities(country: string) {
       cities: null,
       error: 'Failed to fetch cities'
     };
+  }
+}
+
+export async function getCityStudios(country: string, city: string) {
+  try {
+    const { data: studios, error } = await supabase
+      .from('studios')
+      .select(`
+        *,
+        studio_programs (*),
+        studio_pricing (*),
+        studio_reviews (*)
+      `)
+      .eq('country', country)
+      .eq('city', city)
+      .eq('business_status', 'OPERATIONAL');
+
+    return { studios, error };
+  } catch (error) {
+    console.error('Error fetching city studios:', error);
+    return { studios: null, error };
   }
 }
 

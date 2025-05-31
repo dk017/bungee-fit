@@ -3,24 +3,27 @@ import { notFound } from "next/navigation";
 import {
   generateCityIntro,
   generateCityConclusion,
-} from "../../lib/cityContent";
-import { StudioCard } from "../../components/StudioCard";
-import { AuthorCard } from "../../components/AuthorCard";
-import { ClientCityPage } from "../../components/ClientCityPage";
-import { CityFeaturedImage } from "../../components/CityFeaturedImage";
-import { getCityWithRelatedData, supabase } from "../../lib/supabase";
+} from "../../../lib/cityContent";
+import { StudioCard } from "../../../components/StudioCard";
+import { AuthorCard } from "../../../components/AuthorCard";
+import { ClientCityPage } from "../../../components/ClientCityPage";
+import { CityFeaturedImage } from "../../../components/CityFeaturedImage";
+import { getCityWithRelatedData, supabase } from "../../../lib/supabase";
 
-// Keep generateStaticParams in the server component
 export async function generateStaticParams() {
-  const { data: cities } = await supabase.from("cities").select("slug");
+  const { data: cities } = await supabase
+    .from("cities")
+    .select("slug, country");
   if (!cities) return [];
   return cities.map((city) => ({
+    country: city.country.toLowerCase(),
     city: `bungee-fitness-${city.slug}`,
   }));
 }
 
 interface PageProps {
   params: {
+    country: string;
     city: string;
   };
 }
@@ -33,14 +36,10 @@ export async function generateMetadata(
 
   if (!cityData) return notFound();
 
-  // Remove "bungee-fitness-" prefix from the slug to get city name
   const citySlug = params.city.replace("bungee-fitness-", "");
-
-  // Format city name for display (e.g., "new-york" -> "New York")
   const cityName =
     cityData?.name ||
     citySlug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-
   const stateOrCountry = cityData?.state || cityData?.country || "";
 
   return {
@@ -51,7 +50,7 @@ export async function generateMetadata(
     openGraph: {
       title: `Bungee Fitness Studios in ${cityName} - Local Classes & Reviews`,
       description: `Find the best bungee fitness studios in ${cityName}. Get fit with this unique workout that combines cardio, strength training, and fun!`,
-      url: `https://bungeefitnessnear.me/bungee-fitness-${citySlug}`,
+      url: `https://bungeefitnessnear.me/${params.country}/bungee-fitness-${citySlug}`,
       siteName: "BungeeFitnessNear.me",
       images: [
         {
@@ -71,7 +70,7 @@ export async function generateMetadata(
       images: ["/og-image.jpg"],
     },
     alternates: {
-      canonical: `https://bungeefitnessnear.me/bungee-fitness-${citySlug}`,
+      canonical: `https://bungeefitnessnear.me/${params.country}/bungee-fitness-${citySlug}`,
     },
     keywords: [
       `bungee fitness ${cityName}`,
@@ -196,12 +195,7 @@ export default async function CityPage({ params }: PageProps) {
               <div className="prose prose-lg max-w-none">
                 {generateCityConclusion({
                   name: name,
-                  state: state,
                   studioCount: studios.length,
-                  uniqueFeatures: [
-                    `Known for ${description},`,
-                    `${name} provides an ideal setting for this innovative workout.`,
-                  ],
                 }).map((paragraph, index) => (
                   <p key={index} className="mb-4">
                     {paragraph}
@@ -211,65 +205,16 @@ export default async function CityPage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* FAQ Section */}
-          <section className="bg-gray-50 py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="text-3xl font-bold mb-8">
-                Frequently Asked Questions
-              </h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-xl font-semibold mb-3">
-                    Is bungee fitness safe?
-                  </h3>
-                  <p className="text-gray-600">
-                    Yes, bungee fitness is very safe when practiced under
-                    certified instructors. All equipment is regularly inspected,
-                    and proper form is emphasized throughout each class.
-                  </p>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-xl font-semibold mb-3">
-                    How many calories can I burn?
-                  </h3>
-                  <p className="text-gray-600">
-                    A typical 60-minute bungee fitness class can burn between
-                    500-800 calories, depending on intensity and individual
-                    factors.
-                  </p>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-xl font-semibold mb-3">
-                    Do I need prior experience?
-                  </h3>
-                  <p className="text-gray-600">
-                    No prior experience is needed. Most studios offer beginner
-                    classes and provide comprehensive instruction for new
-                    participants.
-                  </p>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-xl font-semibold mb-3">
-                    What should I wear?
-                  </h3>
-                  <p className="text-gray-600">
-                    Wear form-fitting athletic clothes that won't ride up during
-                    inversions. Leggings and a fitted top are recommended. Avoid
-                    loose clothing.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Author Card Section */}
-          <section className="bg-gray-50 py-12">
+          {/* Author Section */}
+          <section className="bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <AuthorCard
-                name="Sophia Chen"
-                title="Aerial Fitness Expert & Studio Reviewer"
-                imageUrl="/sophia-chen.jpg"
-                bio="Hey there! I'm Sophia, your aerial fitness guide and studio explorer. With a background in Sports Science from UCLA and certification in aerial arts instruction, I've dedicated myself to discovering and reviewing the best aerial fitness experiences across the country."
+                name={"Sophia Chen"}
+                title={"Founder of Bungee Fitness"}
+                imageUrl={"/sophia-chen.jpg"}
+                bio={
+                  "Sophia is the founder of Bungee Fitness. She is a certified bungee fitness instructor and has been teaching bungee fitness for 10 years. \nShe is also a certified aerial yoga instructor and has been teaching aerial yoga for 5 years. \n Out of that interest, she created Bungee Fitness to share her love for this unique workout with others."
+                }
               />
             </div>
           </section>

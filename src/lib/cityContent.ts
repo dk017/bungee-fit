@@ -6,6 +6,13 @@ interface CityContentProps {
     nearbyCity?: string;
   }
 
+
+
+  interface closeCityContentProps {
+    name: string;
+    studioCount: number;
+  }
+
   export const generateCityIntro = ({
     name,
     state,
@@ -31,10 +38,8 @@ interface CityContentProps {
 
   export const generateCityConclusion = ({
     name,
-    state,
     studioCount,
-    nearbyCity,
-  }: CityContentProps): string[] => {
+  }: closeCityContentProps): string[] => {
     const studioText = studioCount === 1
       ? "While there may be limited options"
       : `With ${studioCount} studios to choose from`;
@@ -46,10 +51,6 @@ interface CityContentProps {
 
       `Remember to book your sessions in advance and always check the studio's weight and age requirements before your first class. Most studios offer introductory packages or trial classes, making it easy to start your bungee fitness journey.`
     ];
-
-    if (nearbyCity) {
-      paragraphs.push(`Planning to travel? Check out our guide to bungee fitness in ${nearbyCity}!`);
-    }
 
     return paragraphs;
   };
