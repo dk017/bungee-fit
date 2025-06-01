@@ -17,7 +17,12 @@ const nextConfig = {
     });
     return config;
   },
-  //output: "export",
+  // Configure static page generation
+  output: 'standalone',
+  experimental: {
+    // Enable edge runtime for better performance
+    runtime: 'edge',
+  },
   distDir: ".next",
 };
 
