@@ -238,6 +238,19 @@ export async function getCountryCities(country: string) {
 
 export async function getCityStudios(country: string, city: string) {
   try {
+    // First get the city ID
+    const { data: cityData, error: cityError } = await supabase
+      .from('cities')
+      .select('id')
+      .eq('slug', city)
+      .single();
+
+    if (cityError || !cityData) {
+      console.error('Error fetching city:', cityError);
+      return { studios: null, error: 'City not found' };
+    }
+
+    // Then get studios for this city
     const { data: studios, error } = await supabase
       .from('studios')
       .select(`
@@ -246,14 +259,18 @@ export async function getCityStudios(country: string, city: string) {
         studio_pricing (*),
         studio_reviews (*)
       `)
-      .eq('country', country)
-      .eq('city', city)
+      .eq('city_id', cityData.id)
       .eq('business_status', 'OPERATIONAL');
 
-    return { studios, error };
+    if (error) {
+      console.error('Error fetching studios:', error);
+      return { studios: null, error };
+    }
+
+    return { studios, error: null };
   } catch (error) {
-    console.error('Error fetching city studios:', error);
-    return { studios: null, error };
+    console.error('Error in getCityStudios:', error);
+    return { studios: null, error: 'Failed to fetch studios' };
   }
 }
 
