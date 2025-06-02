@@ -41,5 +41,8 @@ export const cityCountryMap: Record<string, string> = {
   'brisbane': 'au',
 
   // New Zealand Cities
-  'auckland': 'nz'
+  'auckland': 'nz',
+  'wellington': 'nz',
+  'christchurch': 'nz',
+  'dunedin': 'nz'
 };

@@ -1,39 +1,38 @@
 import { MetadataRoute } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { cityCountryMap } from '../lib/city-country';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Fetch all cities from your database
-  const { data: cities } = await supabase
-    .from('cities')
-    .select('slug, country, updated_at');
-
+export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://bungeefitnessnear.me';
+  
+  // Create entries for each city with the new URL structure
+  const cityEntries = Object.entries(cityCountryMap).map(([citySlug, country]) => ({
+    url: `${baseUrl}/${country}/bungee-fitness-${citySlug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
 
-  // Start with static routes
-  const routes: MetadataRoute.Sitemap = [
+  // Add static pages
+  const staticPages = [
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
+      changeFrequency: 'daily' as const,
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
     },
   ];
 
-  // Add dynamic city routes with country
-  if (cities) {
-    const cityRoutes = cities.map((city) => ({
-      url: `${baseUrl}/${city.country.toLowerCase()}/bungee-fitness-${city.slug}`,
-      lastModified: new Date(city.updated_at),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }));
-    routes.push(...cityRoutes);
-  }
-
-  return routes;
+  return [...staticPages, ...cityEntries];
 }
