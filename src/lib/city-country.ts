@@ -34,11 +34,31 @@ export const cityCountryMap: Record<string, string> = {
   // UK Cities
   'london': 'uk',
   'manchester-uk': 'uk',
+  'birmingham-uk': 'uk',
+  'edinburgh-uk': 'uk',
+  'liverpool-uk': 'uk',
+  'leeds-uk': 'uk',
+  'sheffield-uk': 'uk',
+  'glasgow-uk': 'uk',
+  'nottingham': 'uk',
+  'bournemouth-uk': 'uk',
+  'bristol-uk': 'uk',
+  'oxford-uk': 'uk',
+  'york-uk': 'uk',
+  'leicester-uk': 'uk',
+
 
   // Australian Cities
   'sydney': 'au',
   'melbourne': 'au',
   'brisbane': 'au',
+  'perth': 'au',
+  'adelaide': 'au',
+  'gold-coast': 'au',
+  'newcastle': 'au',
+  'canberra': 'au',
+  'wollongong': 'au',
+  'sunshine-coast': 'au',
 
   // New Zealand Cities
   'auckland': 'nz',
