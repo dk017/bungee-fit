@@ -30,6 +30,7 @@ export const cityCountryMap: Record<string, string> = {
   'san-antonio': 'us',
   'wichita': 'us',
   'st-louis': 'us',
+  'evansville': 'us',
 
   // UK Cities
   'london': 'uk',
