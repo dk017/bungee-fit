@@ -31,6 +31,7 @@ export const cityCountryMap: Record<string, string> = {
   'wichita': 'us',
   'st-louis': 'us',
   'evansville': 'us',
+  'cincinnati': 'us',
 
   // UK Cities
   'london': 'uk',
