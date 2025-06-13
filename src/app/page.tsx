@@ -352,20 +352,19 @@ type ArticlePreview = {
 // Add popular articles data
 const popularArticles: ArticlePreview[] = [
   {
-    title: "Bungee Fitness NYC – Explore Best Bungee Studios Near You",
+    title: "Chicago Bungee: Studios, Prices & What to Expect on Day 1",
     author: "Sophia Chen",
     date: "2024-01-15",
-    slug: "bungee-fitness-nyc",
-    excerpt:
-      "Discover the top-rated bungee fitness studios in New York City...",
+    slug: "bungee-fitness-chicago",
+    excerpt: "Discover the top-rated bungee fitness studios in Chicago...",
     category: "Bungee Studios, USA",
   },
   {
-    title: "Bungee Fitness Chicago, Illinois – Top Bungee Studios Near You",
+    title: "Houston’s High-Flying Workouts: A Local’s Guide to Bungee Fitness",
     author: "Sophia Chen",
     date: "2024-01-10",
-    slug: "bungee-fitness-chicago",
-    excerpt: "Find the best bungee fitness studios in Chicago...",
+    slug: "bungee-fitness-houston",
+    excerpt: "Find the best bungee fitness studios in Houston...",
     category: "Bungee Studios, USA",
   },
   // ... more articles
@@ -376,12 +375,12 @@ const scientificBenefits = [
   {
     title: "The Science Behind Bungee Low-Impact Exercise",
     content:
-      "Behind the airborne fun is solid biomechanics: cords reduce impact, boost heart rate and engage every muscle without hammering your joints.",
+      "Bungee workouts may look like pure mid-air fun, but they are built on solid biomechanics. The cord lightens your body-weight just enough to protect joints while still driving your heart rate up and challenging every major muscle group.",
   },
   {
     title: "Bungee Cord Mechanics",
     content:
-      "The Bungee Cord creates an uncommon synergy of low-impact resistance. As you move, they provide a gentle, consistent pull, making each exercise a graceful dance with physics.",
+      "Each move meets a steady counter-pull from the elastic line, softening impact yet keeping muscles under constant tension. The sensation is a smooth, spring-loaded glide—almost a playful tug-of-war with gravity.",
   },
 ];
 
@@ -543,10 +542,9 @@ export default function HomePage() {
               </h2>
               <div className="prose prose-lg text-gray-600">
                 <p>
-                  Bungee Fitness is an innovative workout trend that combines
-                  elements of resistance exercise, cardio, and acrobatics. Using
-                  a specialized harness and bungee cord attached to the ceiling,
-                  you'll experience a unique low-impact, high-intensity workout.
+                  Bungee training fuses resistance drills, heart-pumping cardio,
+                  and a dash of aerial acrobatics into a single cutting-edge
+                  routine.
                 </p>
                 <p>
                   Originally derived from aerial arts and circus performances,
