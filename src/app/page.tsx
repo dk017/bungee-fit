@@ -353,7 +353,7 @@ type ArticlePreview = {
 const popularArticles: ArticlePreview[] = [
   {
     title: "Bungee Fitness NYC – Explore Best Bungee Studios Near You",
-    author: "Amelia Watson",
+    author: "Sophia Chen",
     date: "2024-01-15",
     slug: "bungee-fitness-nyc",
     excerpt:
@@ -362,7 +362,7 @@ const popularArticles: ArticlePreview[] = [
   },
   {
     title: "Bungee Fitness Chicago, Illinois – Top Bungee Studios Near You",
-    author: "Amelia Watson",
+    author: "Sophia Chen",
     date: "2024-01-10",
     slug: "bungee-fitness-chicago",
     excerpt: "Find the best bungee fitness studios in Chicago...",
@@ -376,7 +376,7 @@ const scientificBenefits = [
   {
     title: "The Science Behind Bungee Low-Impact Exercise",
     content:
-      "Bungee fitness isn't just about soaring through the air; it's grounded in science. It's a symphony of science and strength, where you defy gravity, tone muscles, and elevate your heart rate while your body revels in the embrace of buoyancy.",
+      "Behind the airborne fun is solid biomechanics: cords reduce impact, boost heart rate and engage every muscle without hammering your joints.",
   },
   {
     title: "Bungee Cord Mechanics",
