@@ -20,9 +20,9 @@ export const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <p className="text-sm text-gray-300">
-              © {new Date().getFullYear()} Bungee Fit. All rights reserved. All
-              written content © {new Date().getFullYear()} Bungee Fitness Near
-              Me; factual business data sourced from public listings.
+              All rights reserved. All written content ©{" "}
+              {new Date().getFullYear()} Bungee Fitness Near Me; factual
+              business data sourced from public listings.
             </p>
             <div className="flex gap-6 mt-4 sm:mt-0">
               <Link
