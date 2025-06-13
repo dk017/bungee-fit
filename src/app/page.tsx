@@ -360,7 +360,7 @@ const popularArticles: ArticlePreview[] = [
     category: "Bungee Studios, USA",
   },
   {
-    title: "Houston’s High-Flying Workouts: A Local’s Guide to Bungee Fitness",
+    title: "Houston's High-Flying Workouts: A Local's Guide to Bungee Fitness",
     author: "Sophia Chen",
     date: "2024-01-10",
     slug: "bungee-fitness-houston",
@@ -566,24 +566,24 @@ export default function HomePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gradient-to-r from-purple-600 to-pink-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">
             Benefits of Bungee Fitness
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit) => (
               <div
                 key={benefit.title}
-                className="bg-white rounded-lg p-6 shadow-sm"
+                className="bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-sm text-white"
               >
                 <div className="text-4xl mb-4">{benefit.icon}</div>
                 <h3 className="text-xl font-semibold mb-4">{benefit.title}</h3>
-                <p className="text-gray-600 mb-4">{benefit.description}</p>
+                <p className="text-white/90 mb-4">{benefit.description}</p>
                 <ul className="space-y-2">
                   {benefit.details.map((detail, index) => (
-                    <li key={index} className="flex items-center text-gray-600">
-                      <span className="text-purple-600 mr-2">•</span>
+                    <li key={index} className="flex items-center text-white/90">
+                      <span className="text-white mr-2">•</span>
                       {detail}
                     </li>
                   ))}
@@ -649,16 +649,16 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gradient-to-r from-purple-600 to-pink-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">
             What Our Community Says
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.name}
-                className="bg-white rounded-lg p-6 shadow-sm"
+                className="bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-sm text-white"
               >
                 <div className="flex items-center mb-4">
                   <div className="relative h-12 w-12 rounded-full overflow-hidden mr-4">
@@ -670,13 +670,13 @@ export default function HomePage() {
                     />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-white">
                       {testimonial.name}
                     </h3>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+                    <p className="text-sm text-white/80">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-gray-600 italic">"{testimonial.quote}"</p>
+                <p className="text-white/90 italic">"{testimonial.quote}"</p>
                 <div className="flex mt-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <span key={i} className="text-yellow-400">
