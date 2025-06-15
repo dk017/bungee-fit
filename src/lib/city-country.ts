@@ -34,6 +34,9 @@ export const cityCountryMap: Record<string, string> = {
   'cincinnati': 'us',
   'cleveland': 'us',
   'columbus': 'us',
+  'charleston': 'us',
+  'shreveport': 'us',
+  'buffalo': 'us',
 
   // UK Cities
   'london': 'uk',
