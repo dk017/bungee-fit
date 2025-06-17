@@ -37,6 +37,9 @@ export const cityCountryMap: Record<string, string> = {
   'charleston': 'us',
   'shreveport': 'us',
   'buffalo': 'us',
+  'albany': 'us',
+  'gaithersburg': 'us',
+  'virginia-beach': 'us',
 
   // UK Cities
   'london': 'uk',
