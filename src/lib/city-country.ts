@@ -40,6 +40,8 @@ export const cityCountryMap: Record<string, string> = {
   'albany': 'us',
   'gaithersburg': 'us',
   'virginia-beach': 'us',
+  'springfield': 'us',
+  'lexington': 'us',
 
   // UK Cities
   'london': 'uk',
