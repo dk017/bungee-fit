@@ -42,6 +42,9 @@ export const cityCountryMap: Record<string, string> = {
   'virginia-beach': 'us',
   'springfield': 'us',
   'lexington': 'us',
+  'fayetteville': 'us',
+  'providence': 'us',
+  'little-rock': 'us',
 
   // UK Cities
   'london': 'uk',
