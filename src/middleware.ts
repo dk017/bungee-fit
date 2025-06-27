@@ -21,10 +21,9 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// More specific matcher to avoid conflicts
+// Only match the specific old URL pattern we want to redirect
 export const config = {
   matcher: [
     '/bungee-fitness-:city*',
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };
