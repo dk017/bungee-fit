@@ -49,6 +49,8 @@ export const cityCountryMap: Record<string, string> = {
   'fort-lauderdale': 'us',
   'raleigh': 'us',
   'minneapolis': 'us',
+  'new-orleans': 'us',
+  'toledo': 'us',
 
   // UK Cities
   'london': 'uk',
