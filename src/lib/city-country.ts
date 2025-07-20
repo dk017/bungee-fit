@@ -52,6 +52,7 @@ export const cityCountryMap: Record<string, string> = {
   'new-orleans': 'us',
   'toledo': 'us',
   'littleton': 'us',
+  'tucson': 'us',
 
   // UK Cities
   'london': 'uk',
