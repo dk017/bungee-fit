@@ -1,4 +1,5 @@
 import { Metadata, ResolvingMetadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   generateCityIntro,
@@ -44,9 +45,8 @@ export async function generateMetadata(
 
   return {
     title: `Bungee Fitness in ${cityName} - Find Local Studios & Classes`,
-    description: `Looking for bungee fitness in ${cityName}${
-      stateOrCountry ? `, ${stateOrCountry}` : ""
-    }? Discover local studios, compare classes, read reviews, and start your low-impact, high-intensity fitness journey today!`,
+    description: `Looking for bungee fitness in ${cityName}${stateOrCountry ? `, ${stateOrCountry}` : ""
+      }? Discover local studios, compare classes, read reviews, and start your low-impact, high-intensity fitness journey today!`,
     openGraph: {
       title: `Bungee Fitness Studios in ${cityName} - Local Classes & Reviews`,
       description: `Find the best bungee fitness studios in ${cityName}. Get fit with this unique workout that combines cardio, strength training, and fun!`,
@@ -148,6 +148,36 @@ export default async function CityPage({ params }: PageProps) {
                         <li>✓ Inform instructor of any injuries</li>
                       </ul>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Gear Recommendations Section */}
+          <section className="bg-slate-50 py-12 border-y border-slate-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold mb-4 text-slate-800">
+                    Gear Up for Bungee Fitness
+                  </h2>
+                  <p className="text-slate-600 mb-6 text-lg">
+                    New to the sport? We've put together comprehensive guides on what to wear and how to set up your own home studio safely.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Link
+                      href="/blog/what-to-wear-bungee-fitness-comfort-guide"
+                      className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
+                    >
+                      Also Read: What to Wear Guide
+                    </Link>
+                    <Link
+                      href="/blog/top-5-essential-bungee-fitness-gear-home-2025"
+                      className="inline-flex items-center px-6 py-3 border border-slate-300 text-base font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm"
+                    >
+                      Best Home Bungee Gear
+                    </Link>
                   </div>
                 </div>
               </div>
